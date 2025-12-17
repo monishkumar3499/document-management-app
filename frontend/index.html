@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KMRL-iDMS</title>
+
+    <!-- External libs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Local stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-gray-50 min-h-screen flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 text-white p-6 flex-shrink-0 sidebar">
+      <div class="flex items-center gap-3 mb-12">
+        <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+          <i class="fa fa-folder-open text-white text-xl"></i>
+        </div>
+        <h1 class="text-xl font-bold">KMRL IDMS</h1>
+      </div>
+      <nav>
+        <ul class="space-y-2">
+          <!-- Home -->
+          <li>
+            <button
+              id="homeBtn"
+              onclick="loadHomeDocs()"
+              class="w-full text-left px-4 py-3 text-white hover:bg-white hover:bg-opacity-10 rounded-lg transition flex items-center gap-3 nav-item"
+              aria-label="Go to Home"
+            >
+              <i class="fa fa-home w-5"></i> 
+              <span>Home</span>
+            </button>
+          </li>
+
+          <!-- Departments dropdown -->
+          <li>
+            <button
+              onclick="toggleDeptDropdown(event)"
+              class="w-full text-left px-4 py-3 text-white hover:bg-white hover:bg-opacity-10 rounded-lg transition flex items-center gap-3 nav-item"
+              aria-label="Toggle Departments Dropdown"
+            >
+              <i class="fa fa-building w-5"></i> 
+              <span>Departments</span>
+              <i class="fa fa-caret-down ml-auto"></i>
+            </button>
+            <ul id="departmentsList" class="hidden pl-8 space-y-1 mt-2"></ul>
+          </li>
+
+          <!-- Upload -->
+          <li>
+            <button
+              id="uploadBtn"
+              onclick="showSection('upload')"
+              class="w-full text-left px-4 py-3 text-white hover:bg-white hover:bg-opacity-10 rounded-lg transition flex items-center gap-3 nav-item"
+              aria-label="Upload Document"
+            >
+              <i class="fa fa-upload w-5"></i> 
+              <span>Upload</span>
+            </button>
+          </li>
+
+          <!-- Dashboard -->
+          <li>
+            <button
+              id="dashboardBtn"
+              onclick="showDashboard()"
+              class="w-full text-left px-4 py-3 text-white hover:bg-white hover:bg-opacity-10 rounded-lg transition flex items-center gap-3 nav-item"
+              aria-label="Open Dashboard"
+            >
+              <i class="fa fa-chart-line w-5"></i>
+              <span>Dashboard</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Mobile Menu Toggle -->
+    <button
+      id="menuToggle"
+      class="md:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-lg"
+      aria-label="Toggle Sidebar"
+    >
+      <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Main Content -->
+    <main class="flex-1 main-content">
+      <!-- Back Button -->
+      <div id="backBtn" class="hidden p-6 pb-0">
+        <button
+          onclick="goBack()"
+          class="back-button"
+          aria-label="Go Back"
+        >
+          <i class="fa fa-arrow-left"></i> Back
+        </button>
+      </div>
+
+      <!-- Upload Section -->
+      <section id="upload" class="hidden p-6">
+        <div class="max-w-6xl">
+          <h1 class="text-3xl font-bold text-gray-900 mb-8">All Documents</h1>
+          
+          <!-- Upload Document Card -->
+          <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Upload Document</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <!-- File Upload Area -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-4">Select File</label>
+                <div
+                  class="upload-area p-8 text-center cursor-pointer"
+                  onclick="document.getElementById('fileInput').click()"
+                >
+                  <div id="uploadAreaContent" class="flex flex-col items-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                      <i class="fa fa-cloud-upload-alt text-blue-500 text-xl"></i>
+                    </div>
+                    <p class="text-blue-600 font-medium mb-1">Upload a file</p>
+                    <p class="text-sm text-gray-500">or drag and drop</p>
+                    <p class="text-xs text-gray-400 mt-2">PNG, JPG, PDF up to 10MB</p>
+                  </div>
+                  <input
+                    type="file"
+                    id="fileInput"
+                    class="hidden"
+                    aria-label="Select File"
+                  />
+                </div>
+              </div>
+              
+              <!-- Priority and Upload -->
+              <div class="flex flex-col justify-center">
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-4">Priority</label>
+                  <div class="flex gap-4">
+                    <label class="flex items-center">
+                      <input
+                        type="radio"
+                        name="priority"
+                        value="Low"
+                        checked
+                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      />
+                      <span class="ml-2 text-sm text-gray-700">Low</span>
+                    </label>
+                    <label class="flex items-center">
+                      <input
+                        type="radio"
+                        name="priority"
+                        value="High"
+                        class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                      />
+                      <span class="ml-2 text-sm text-gray-700">High</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <button
+                  onclick="handleUpload()"
+                  class="btn-primary w-full justify-center"
+                  aria-label="Upload Document"
+                >
+                  <i class="fa fa-upload"></i>
+                  Upload Document
+                </button>
+              </div>
+            </div>
+            <div id="uploadMsg" class="mt-4 text-green-600 font-medium"></div>
+          </div>
+
+          <!-- Content Tables -->
+          <div class="bg-white rounded-xl shadow-sm p-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Content Tables</h2>
+            <div class="overflow-x-auto">
+              <table id="documentsTable" class="content-table w-full">
+                <thead>
+                  <tr>
+                    <th>Document Name</th>
+                    <th>Department</th>
+                    <th>Uploaded By</th>
+                    <th>Uploaded Date</th>
+                    <th>Priority</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="documentsTableBody">
+                  <!-- Documents will be populated here -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Table pagination -->
+            <div class="flex justify-between items-center mt-6">
+              <button
+                class="btn-secondary"
+                id="prevTableBtn"
+                onclick="prevTablePage()"
+                disabled
+              >
+                <i class="fa fa-chevron-left"></i>
+                Previous
+              </button>
+              <span class="text-sm text-gray-600" id="tablePageInfo">Page 1</span>
+              <button
+                class="btn-secondary"
+                id="nextTableBtn"
+                onclick="nextTablePage()"
+              >
+                Next
+                <i class="fa fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Home Section -->
+      <section id="home" class="hidden p-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">All Documents</h1>
+        <div
+          id="homeDashboard"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8"
+        ></div>
+        <div
+          id="docList"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        ></div>
+      </section>
+
+      <!-- Department Section -->
+      <section id="department" class="hidden p-6">
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+          <div class="dept-header">
+            <div class="dept-icon">
+              <i class="fa fa-building"></i>
+            </div>
+            <h1 id="deptTitle" class="dept-title"></h1>
+          </div>
+        </div>
+        <div
+          id="deptDashboard"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8"
+        ></div>
+        <div id="deptDocs" class="space-y-6"></div>
+      </section>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" class="hidden p-6">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+        <div
+          id="mainDashboard"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8"
+        ></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              Recent Documents
+            </h3>
+            <div id="recentDocuments" class="space-y-4"></div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              Department Status
+            </h3>
+            <div id="departmentStatus" class="space-y-4"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal -->
+    <div
+      id="docModal"
+      class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50"
+    >
+      <div class="bg-white p-6 rounded-xl w-11/12 sm:w-3/4 max-w-4xl modal-content relative">
+        <button
+          onclick="closeModal()"
+          class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"
+          aria-label="Close Modal"
+        >
+          <i class="fa fa-times"></i>
+        </button>
+        <h2 id="modalTitle" class="text-xl font-semibold text-gray-800 mb-4"></h2>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200 mb-4">
+          <button
+            id="tabContentBtn"
+            onclick="switchTab('content')"
+            class="px-4 py-2 font-medium text-blue-600 border-b-2 border-blue-600"
+            aria-label="View Content Tab"
+          >
+            Content
+          </button>
+          <button
+            id="tabTablesBtn"
+            onclick="switchTab('tables')"
+            class="px-4 py-2 font-medium text-gray-600 hover:text-blue-600"
+            aria-label="View Tables Tab"
+          >
+            Tables
+          </button>
+        </div>
+
+        <!-- Tab Container -->
+        <div id="tabContainer" class="mb-6">
+          <div id="tabContent" class="tab-pane text-gray-700"></div>
+          <div id="tabTables" class="tab-pane hidden"></div>
+        </div>
+
+        <!-- Slide Controls -->
+        <div class="flex justify-between items-center mb-4">
+          <button
+            id="prevBtn"
+            onclick="showPrevSlide()"
+            class="btn-secondary disabled:opacity-50"
+            aria-label="Previous Slide"
+          >
+            <i class="fa fa-chevron-left"></i>
+            Previous
+          </button>
+          <span id="slideIndicator" class="text-gray-600 font-medium"></span>
+          <button
+            id="nextBtn"
+            onclick="showNextSlide()"
+            class="btn-secondary disabled:opacity-50"
+            aria-label="Next Slide"
+          >
+            Next
+            <i class="fa fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Download Buttons -->
+        <div class="flex gap-4">
+          <a
+            id="downloadLink"
+            class="btn-secondary"
+            target="_blank"
+            style="display: none"
+            aria-label="Download Processed PDF"
+          >
+            <i class="fa fa-download"></i>
+            Download PDF
+          </a>
+          <a
+            id="downloadOriginalLink"
+            class="btn-secondary"
+            target="_blank"
+            style="display: none"
+            aria-label="Download Original Document"
+          >
+            <i class="fa fa-download"></i>
+            Download Original
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div
+      id="notificationContainer"
+      class="fixed top-4 right-4 z-50 space-y-2"
+    ></div>
+
+    <!-- Local script -->
+    <script src="script.js"></script>
+  </body>
+</html>
